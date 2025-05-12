@@ -9,6 +9,11 @@ const config: CapacitorConfig = {
     url: 'https://c1762714-456e-4803-b9ba-8b496bea93ae.lovableproject.com?forceHideBadge=true',
     cleartext: true
   },
+  android: {
+    path: 'android',
+    // Add this if you need to specify a different SDK path
+    // gradlePath: 'C:\\Users\\YourUsername\\AppData\\Local\\Android\\Sdk'
+  },
   plugins: {
     Camera: {
       permissions: ["camera"]
