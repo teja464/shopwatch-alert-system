@@ -1,73 +1,96 @@
-# Welcome to your Lovable project
 
-## Project info
+# Shop Security Monitor - Mobile Installation Guide
 
-**URL**: https://lovable.dev/projects/c1762714-456e-4803-b9ba-8b496bea93ae
+This guide will help you get the Shop Security Monitor app running on your mobile device.
 
-## How can I edit this code?
+## Prerequisites
 
-There are several ways of editing your application.
+- Node.js (v16 or higher)
+- npm (comes with Node.js)
+- Git
+- For iOS: Mac computer with Xcode installed
+- For Android: Android Studio with SDK tools installed
 
-**Use Lovable**
+## Step 1: Clone the repository to your laptop
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/c1762714-456e-4803-b9ba-8b496bea93ae) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+1. Transfer the project to your own GitHub repository using the "Export to GitHub" button in Lovable
+2. Clone the project to your local machine:
+```bash
+git clone <YOUR_GITHUB_REPO_URL>
+cd shopwatch-alert-system
 ```
 
-**Edit a file directly in GitHub**
+## Step 2: Install dependencies
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+npm install
+```
 
-**Use GitHub Codespaces**
+## Step 3: Add mobile platforms
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+For Android:
+```bash
+npx cap add android
+```
 
-## What technologies are used for this project?
+For iOS (Mac only):
+```bash
+npx cap add ios
+```
 
-This project is built with:
+## Step 4: Update native platforms
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+For Android:
+```bash
+npx cap update android
+```
 
-## How can I deploy this project?
+For iOS:
+```bash
+npx cap update ios
+```
 
-Simply open [Lovable](https://lovable.dev/projects/c1762714-456e-4803-b9ba-8b496bea93ae) and click on Share -> Publish.
+## Step 5: Build the web app
 
-## Can I connect a custom domain to my Lovable project?
+```bash
+npm run build
+```
 
-Yes, you can!
+## Step 6: Sync the web code to the native projects
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+```bash
+npx cap sync
+```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## Step 7: Run on a device or emulator
+
+For Android:
+```bash
+npx cap run android
+```
+
+For iOS:
+```bash
+npx cap run ios
+```
+
+## Making Changes
+
+After making changes to the web code:
+
+1. Rebuild the project: `npm run build`
+2. Sync changes to native projects: `npx cap sync`
+3. Run on device again: `npx cap run android` or `npx cap run ios`
+
+## Troubleshooting
+
+- Make sure your phone is in developer mode and connected to your computer
+- For Android, enable USB debugging in developer options
+- For iOS, trust the computer on your device when prompted
+- Check that you have the latest Xcode or Android Studio installed
+
+## Important Notes
+
+- The app requires camera permissions to detect motion
+- Allow notifications when prompted for alarm functionality
+- The app must be running (at least in background) to monitor for motion
