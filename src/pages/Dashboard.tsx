@@ -1,8 +1,8 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -19,6 +19,7 @@ const Dashboard = () => {
   const [timePresent, setTimePresent] = useState(60);
   const [inShopTimer, setInShopTimer] = useState<NodeJS.Timeout | null>(null);
   const [timeRemaining, setTimeRemaining] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [userData, setUserData] = useState<{
     firstName: string;
     lastName: string;
@@ -26,14 +27,36 @@ const Dashboard = () => {
     closingTime: string;
   } | null>(null);
 
+  // Initialize audio element
+  useEffect(() => {
+    audioRef.current = new Audio("https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3");
+    audioRef.current.loop = true;
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
   // Play alarm sound when active
   useEffect(() => {
-    let audio: HTMLAudioElement | null = null;
-    
-    if (alarmActive) {
-      audio = new Audio("https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3");
-      audio.loop = true;
-      audio.play().catch(e => console.error("Error playing alarm:", e));
+    if (alarmActive && audioRef.current) {
+      // Play sound with a small delay to ensure it starts
+      const playPromise = audioRef.current.play();
+      
+      // Handle potential play() promise rejection (browsers may block autoplay)
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.error("Error playing alarm:", error);
+          toast({
+            variant: "destructive",
+            title: "Alarm Sound Error",
+            description: "Could not play alarm sound. Check your browser permissions.",
+          });
+        });
+      }
       
       // Show verification dialog after 3 seconds
       const timer = setTimeout(() => {
@@ -42,13 +65,17 @@ const Dashboard = () => {
       
       return () => {
         clearTimeout(timer);
-        if (audio) {
-          audio.pause();
-          audio = null;
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
         }
       };
+    } else if (!alarmActive && audioRef.current) {
+      // Make sure audio is paused when alarm is deactivated
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
     }
-  }, [alarmActive]);
+  }, [alarmActive, toast]);
 
   // Load user data on mount
   useEffect(() => {
@@ -264,6 +291,9 @@ const Dashboard = () => {
                 <BellRing className="h-5 w-5 animate-pulse" />
                 Security Alert - Motion Detected!
               </DialogTitle>
+              <DialogDescription className="text-center">
+                The alarm is now sounding. Respond to cancel.
+              </DialogDescription>
             </DialogHeader>
             <div className="flex justify-center my-4">
               <Button 
@@ -282,6 +312,9 @@ const Dashboard = () => {
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Are you currently in the shop?</DialogTitle>
+              <DialogDescription>
+                Please confirm if this is an authorized entry.
+              </DialogDescription>
             </DialogHeader>
             <div className="flex justify-center gap-4 my-4">
               <Button 
@@ -304,6 +337,9 @@ const Dashboard = () => {
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>How long will you be in the shop?</DialogTitle>
+              <DialogDescription>
+                Set a timer for your visit. The system will automatically re-arm after this time.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
