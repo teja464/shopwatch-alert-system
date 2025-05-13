@@ -40,6 +40,8 @@ npx cap add ios
 
 ## Step 4: Update native platforms
 
+After adding the platforms, update the native projects:
+
 For Android:
 ```bash
 npx cap update android
@@ -50,19 +52,27 @@ For iOS:
 npx cap update ios
 ```
 
-## Step 5: Build the web app
+## Step 5: Add MP3 Alarm Sound File
+
+**IMPORTANT:** You need to add an alarm sound file to make the alarm function properly:
+
+1. Download a suitable alarm sound MP3 file
+2. Name it `alarm-sound.mp3`
+3. Place it in the `public/` folder of your project
+
+## Step 6: Build the web app
 
 ```bash
 npm run build
 ```
 
-## Step 6: Sync the web code to the native projects
+## Step 7: Sync the web code to the native projects
 
 ```bash
 npx cap sync
 ```
 
-## Step 7: Run on a device or emulator
+## Step 8: Run on a device or emulator
 
 For Android:
 ```bash
@@ -88,9 +98,11 @@ After making changes to the web code:
 - For Android, enable USB debugging in developer options
 - For iOS, trust the computer on your device when prompted
 - Check that you have the latest Xcode or Android Studio installed
+- If alarm doesn't work, verify you've added the alarm-sound.mp3 file to the public folder
 
 ## Important Notes
 
 - The app requires camera permissions to detect motion
 - Allow notifications when prompted for alarm functionality
 - The app must be running (at least in background) to monitor for motion
+- Shop closing hours determine when motion detection is active

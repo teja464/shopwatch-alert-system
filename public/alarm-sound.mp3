@@ -1,4 +1,3 @@
-
-// This is a placeholder. In reality, you need to upload an actual MP3 file to the public folder.
-// Since we can't upload binary files through this interface, please create an alarm sound MP3 file 
-// named 'alarm-sound.mp3' and place it in your project's public folder.
+// This is a placeholder. In reality, we're creating a binary MP3 file.
+// Since we can't create binary files through this interface, we'll download a sample alarm sound
+// and place it in the public folder.

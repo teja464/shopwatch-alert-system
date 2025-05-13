@@ -1,17 +1,21 @@
 
-import { useState } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Cloud } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-interface RecordingEntry {
+export interface RecordingEntry {
   id: string;
   timestamp: Date;
   duration: number; // in seconds
 }
 
-const CloudStorage = () => {
+interface CloudStorageProps {
+  onMount?: (methods: { addRecording: (duration: number) => string }) => void;
+}
+
+const CloudStorage = ({ onMount }: CloudStorageProps) => {
   const { toast } = useToast();
   const [recordings, setRecordings] = useState<RecordingEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +36,13 @@ const CloudStorage = () => {
     
     return newRecording.id;
   };
+
+  // Expose methods to parent component
+  useEffect(() => {
+    if (onMount) {
+      onMount({ addRecording });
+    }
+  }, [onMount]);
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {

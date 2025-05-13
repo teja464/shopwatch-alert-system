@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -315,13 +314,7 @@ const Dashboard = () => {
         
         {/* Cloud Storage Component */}
         <CloudStorage 
-          ref={(el) => {
-            if (el) {
-              handleCloudStorageMount({
-                addRecording: el.addRecording
-              });
-            }
-          }}
+          onMount={handleCloudStorageMount}
         />
         
         <Dialog open={alarmActive} onOpenChange={setAlarmActive}>
