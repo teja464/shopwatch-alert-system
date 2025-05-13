@@ -5,10 +5,11 @@ import { useToast } from "@/hooks/use-toast";
 
 interface MotionDetectorProps {
   isActive: boolean;
+  isShopClosed: boolean; // New prop to check if shop is closed
   onMotionDetected: () => void;
 }
 
-const MotionDetector = ({ isActive, onMotionDetected }: MotionDetectorProps) => {
+const MotionDetector = ({ isActive, isShopClosed, onMotionDetected }: MotionDetectorProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const requestRef = useRef<number>();
@@ -95,7 +96,7 @@ const MotionDetector = ({ isActive, onMotionDetected }: MotionDetectorProps) => 
       const currentPixels = ctx.getImageData(0, 0, canvas.width, canvas.height);
       
       // Compare with previous frame if we have one
-      if (previousPixelsRef.current) {
+      if (previousPixelsRef.current && isShopClosed) { // Only detect motion when shop is closed
         const diff = compareFrames(previousPixelsRef.current, currentPixels);
         
         // If motion detected
@@ -119,7 +120,7 @@ const MotionDetector = ({ isActive, onMotionDetected }: MotionDetectorProps) => 
         cancelAnimationFrame(requestRef.current);
       }
     };
-  }, [isActive, hasCamera, onMotionDetected]);
+  }, [isActive, hasCamera, isShopClosed, onMotionDetected]);
 
   // Compare frames to detect motion
   const compareFrames = (frame1: ImageData, frame2: ImageData) => {
@@ -169,6 +170,16 @@ const MotionDetector = ({ isActive, onMotionDetected }: MotionDetectorProps) => 
             {!hasCamera && (
               <div className="absolute inset-0 flex items-center justify-center text-white bg-black bg-opacity-80">
                 <p>Camera access required</p>
+              </div>
+            )}
+            {isShopClosed && (
+              <div className="absolute bottom-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                Motion detection active
+              </div>
+            )}
+            {!isShopClosed && hasCamera && (
+              <div className="absolute bottom-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                Monitoring only
               </div>
             )}
           </>

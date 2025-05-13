@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import MotionDetector from "@/components/MotionDetector";
+import { CloudStorage, type RecordingEntry } from "@/components/CloudStorage";
 import { Bell, BellRing } from "lucide-react";
 
 const Dashboard = () => {
@@ -19,7 +20,11 @@ const Dashboard = () => {
   const [timePresent, setTimePresent] = useState(60);
   const [inShopTimer, setInShopTimer] = useState<NodeJS.Timeout | null>(null);
   const [timeRemaining, setTimeRemaining] = useState(0);
+  const [isShopClosed, setIsShopClosed] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const cloudStorageRef = useRef<{
+    addRecording: (duration: number) => string;
+  } | null>(null);
   const [userData, setUserData] = useState<{
     firstName: string;
     lastName: string;
@@ -27,9 +32,10 @@ const Dashboard = () => {
     closingTime: string;
   } | null>(null);
 
-  // Initialize audio element
+  // Initialize audio element with local alarm sound
   useEffect(() => {
-    audioRef.current = new Audio("https://assets.mixkit.co/active_storage/sfx/212/212-preview.mp3");
+    // Using local alarm sound file from public folder
+    audioRef.current = new Audio("/alarm-sound.mp3");
     audioRef.current.loop = true;
     
     return () => {
@@ -120,6 +126,9 @@ const Dashboard = () => {
         currentTime > closingTime || 
         (closingTime < openingTime && (currentTime > closingTime && currentTime < openingTime));
       
+      // Update shop closed status
+      setIsShopClosed(shouldBeArmed);
+      
       if (shouldBeArmed !== systemArmed && timeRemaining === 0) {
         setSystemArmed(shouldBeArmed);
         
@@ -145,9 +154,16 @@ const Dashboard = () => {
   }, [userData, systemArmed, timeRemaining, toast]);
 
   const handleMotionDetected = () => {
-    if (systemArmed && !alarmActive && timeRemaining === 0) {
+    // Only trigger alarm if system is armed, shop is closed, alarm not already active and not in temp access mode
+    if (systemArmed && isShopClosed && !alarmActive && timeRemaining === 0) {
       console.log("Motion detected while system armed!");
       setAlarmActive(true);
+      
+      // Record the motion event to cloud storage (30 second clip)
+      if (cloudStorageRef.current) {
+        cloudStorageRef.current.addRecording(30);
+      }
+      
       triggerNotification();
     }
   };
@@ -178,6 +194,11 @@ const Dashboard = () => {
     if (isPresent) {
       setShowTimer(true);
     } else {
+      // Add a recording to cloud storage (120 seconds)
+      if (cloudStorageRef.current) {
+        cloudStorageRef.current.addRecording(120);
+      }
+      
       // TODO: In a real app, this would trigger recording, call emergency contacts, etc.
       toast({
         variant: "destructive",
@@ -231,6 +252,11 @@ const Dashboard = () => {
     });
   };
 
+  // Update the cloud storage ref
+  const handleCloudStorageMount = (methods: { addRecording: (duration: number) => string }) => {
+    cloudStorageRef.current = methods;
+  };
+
   return (
     <div className="min-h-screen bg-slate-100 p-4">
       <div className="container max-w-lg mx-auto space-y-6">
@@ -275,14 +301,28 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <MotionDetector 
-              isActive={true} 
+              isActive={true}
+              isShopClosed={isShopClosed} 
               onMotionDetected={handleMotionDetected}
             />
             <p className="text-xs text-center mt-2 text-muted-foreground">
-              Motion detection {systemArmed ? "active" : "inactive"}
+              {isShopClosed 
+                ? `Motion detection ${systemArmed ? "active" : "inactive"}` 
+                : "Shop open - monitoring only (no motion detection)"}
             </p>
           </CardContent>
         </Card>
+        
+        {/* Cloud Storage Component */}
+        <CloudStorage 
+          ref={(el) => {
+            if (el) {
+              handleCloudStorageMount({
+                addRecording: el.addRecording
+              });
+            }
+          }}
+        />
         
         <Dialog open={alarmActive} onOpenChange={setAlarmActive}>
           <DialogContent className="sm:max-w-md">
