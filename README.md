@@ -35,6 +35,20 @@ http://localhost:5173
 
 6. For the best experience, allow camera and notification permissions when prompted.
 
+## Deployment to Render or similar platforms
+
+1. Make sure you have committed all changes to your repository
+
+2. On Render.com:
+   - Create a new Web Service
+   - Connect your GitHub repository
+   - Use the following settings:
+     - Build Command: `npm run build`
+     - Start Command: `npm start`
+   - Click "Create Web Service"
+
+3. The application will be deployed and available at the URL provided by Render
+
 ## Mobile Installation Guide
 
 ### Prerequisites
