@@ -1,5 +1,5 @@
 
-import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Cloud } from "lucide-react";
@@ -100,4 +100,4 @@ const CloudStorage = ({ onMount }: CloudStorageProps) => {
   );
 };
 
-export { CloudStorage, type RecordingEntry };
+export { CloudStorage };

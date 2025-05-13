@@ -1,3 +1,4 @@
+
 // This is a placeholder. In reality, we're creating a binary MP3 file.
 // Since we can't create binary files through this interface, we'll download a sample alarm sound
 // and place it in the public folder.

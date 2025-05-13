@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,9 +34,25 @@ const Dashboard = () => {
 
   // Initialize audio element with local alarm sound
   useEffect(() => {
-    // Using local alarm sound file from public folder
-    audioRef.current = new Audio("/alarm-sound.mp3");
-    audioRef.current.loop = true;
+    try {
+      audioRef.current = new Audio("/alarm-sound.mp3");
+      audioRef.current.loop = true;
+      
+      // Test load the audio file
+      audioRef.current.addEventListener('error', (e) => {
+        console.error("Error loading alarm sound:", e);
+        toast({
+          variant: "destructive",
+          title: "Alarm Sound Error",
+          description: "Could not load alarm sound file. Please ensure alarm-sound.mp3 is in the public folder.",
+        });
+      });
+      
+      // Preload the audio
+      audioRef.current.load();
+    } catch (error) {
+      console.error("Error setting up audio:", error);
+    }
     
     return () => {
       if (audioRef.current) {
@@ -43,7 +60,7 @@ const Dashboard = () => {
         audioRef.current = null;
       }
     };
-  }, []);
+  }, [toast]);
 
   // Play alarm sound when active
   useEffect(() => {
@@ -87,6 +104,16 @@ const Dashboard = () => {
     const storedUser = localStorage.getItem("shopSecurityUser");
     if (storedUser) {
       setUserData(JSON.parse(storedUser));
+    } else {
+      // Add sample user data if none exists
+      const sampleUser = {
+        firstName: "Store",
+        lastName: "Owner",
+        openingTime: "09:00",
+        closingTime: "18:00"
+      };
+      localStorage.setItem("shopSecurityUser", JSON.stringify(sampleUser));
+      setUserData(sampleUser);
     }
   }, []);
 
