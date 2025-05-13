@@ -49,6 +49,9 @@ http://localhost:5173
 
 3. The application will be deployed and available at the URL provided by Render
 
+4. Troubleshooting deployment:
+   - If you encounter any issues with the server.js file, make sure the file is using ES module syntax (import/export) instead of CommonJS (require) since the project is set up with "type": "module" in package.json.
+
 ## Mobile Installation Guide
 
 ### Prerequisites
