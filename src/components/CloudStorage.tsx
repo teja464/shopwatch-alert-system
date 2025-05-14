@@ -15,10 +15,54 @@ interface CloudStorageProps {
   onMount?: (methods: { addRecording: (duration: number) => string }) => void;
 }
 
+const STORAGE_KEY = "shop-security-recordings";
+
 const CloudStorage = ({ onMount }: CloudStorageProps) => {
   const { toast } = useToast();
   const [recordings, setRecordings] = useState<RecordingEntry[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Load recordings from localStorage on component mount
+  useEffect(() => {
+    const loadRecordings = () => {
+      try {
+        const savedRecordings = localStorage.getItem(STORAGE_KEY);
+        if (savedRecordings) {
+          // Parse the JSON and convert timestamp strings back to Date objects
+          const parsedRecordings = JSON.parse(savedRecordings).map((rec: any) => ({
+            ...rec,
+            timestamp: new Date(rec.timestamp)
+          }));
+          setRecordings(parsedRecordings);
+        }
+      } catch (error) {
+        console.error("Error loading recordings from storage:", error);
+        toast({
+          variant: "destructive",
+          title: "Storage Error",
+          description: "Could not load saved recordings."
+        });
+      }
+    };
+    
+    loadRecordings();
+  }, [toast]);
+
+  // Save recordings to localStorage whenever they change
+  useEffect(() => {
+    if (recordings.length > 0) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(recordings));
+      } catch (error) {
+        console.error("Error saving recordings to storage:", error);
+        toast({
+          variant: "destructive",
+          title: "Storage Error",
+          description: "Could not save recordings to storage."
+        });
+      }
+    }
+  }, [recordings, toast]);
 
   const addRecording = (duration: number) => {
     const newRecording: RecordingEntry = {
