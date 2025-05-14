@@ -1,3 +1,4 @@
+
 # Shop Security Monitor - Installation Guide
 
 This guide will help you get the Shop Security Monitor app running on your mobile device or as a web application.
@@ -49,8 +50,8 @@ http://localhost:5173
 3. The application will be deployed and available at the URL provided by Render
 
 4. Troubleshooting deployment:
-   - If you encounter any issues with the server.js file, make sure the file is using ES module syntax (import/export) instead of CommonJS (require) since the project is set up with "type": "module" in package.json.
-   - If you see a "Missing parameter name" error related to path-to-regexp, check that your route patterns in server.js are simple (e.g., '/*' instead of '*').
+   - If you encounter a "require is not defined in ES module scope" error, make sure server.js is using ES module syntax (import/export) since the project has "type": "module" in package.json.
+   - If you see a "Missing parameter name" error related to path-to-regexp, ensure that your route patterns in server.js are very simple. Use '*' instead of '/*' or other patterns.
    - For persistent errors, try clearing the build cache on your deployment platform and redeploying.
 
 ## Mobile Installation Guide
@@ -166,6 +167,7 @@ After making changes to the web code:
 - For iOS, trust the computer on your device when prompted
 - Check that you have the latest Xcode or Android Studio installed
 - If alarm doesn't work, verify you've added the alarm-sound.mp3 file to the public folder
+- The app uses localStorage to store recordings for persistence across browser sessions
 
 ## Important Notes
 
