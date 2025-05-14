@@ -51,7 +51,7 @@ http://localhost:5173
 
 4. Troubleshooting deployment:
    - If you encounter a "require is not defined in ES module scope" error, make sure server.js is using ES module syntax (import/export) since the project has "type": "module" in package.json.
-   - If you see a "Missing parameter name" error related to path-to-regexp, ensure that your route patterns in server.js are very simple. Use '*' instead of '/*' or other patterns.
+   - If you see a "Missing parameter name" error related to path-to-regexp, this is an issue with how Express routes are defined. We've updated server.js to use a simplified approach that completely avoids pattern matching.
    - For persistent errors, try clearing the build cache on your deployment platform and redeploying.
 
 ## Mobile Installation Guide
