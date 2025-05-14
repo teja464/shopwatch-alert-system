@@ -22,6 +22,8 @@ const Dashboard = () => {
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [isShopClosed, setIsShopClosed] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [alarmSoundLoaded, setAlarmSoundLoaded] = useState(false);
+  const [alarmSoundError, setAlarmSoundError] = useState<string | null>(null);
   const cloudStorageRef = useRef<{
     addRecording: (duration: number) => string;
   } | null>(null);
@@ -35,12 +37,20 @@ const Dashboard = () => {
   // Initialize audio element with local alarm sound
   useEffect(() => {
     try {
-      audioRef.current = new Audio("/alarm-sound.mp3");
+      audioRef.current = new Audio();
+      audioRef.current.src = "/alarm-sound.mp3";
       audioRef.current.loop = true;
       
       // Test load the audio file
+      audioRef.current.addEventListener('canplaythrough', () => {
+        console.log("Alarm sound loaded successfully");
+        setAlarmSoundLoaded(true);
+        setAlarmSoundError(null);
+      });
+      
       audioRef.current.addEventListener('error', (e) => {
         console.error("Error loading alarm sound:", e);
+        setAlarmSoundError("Could not load alarm sound file");
         toast({
           variant: "destructive",
           title: "Alarm Sound Error",
@@ -52,6 +62,7 @@ const Dashboard = () => {
       audioRef.current.load();
     } catch (error) {
       console.error("Error setting up audio:", error);
+      setAlarmSoundError("Error setting up audio player");
     }
     
     return () => {
@@ -65,6 +76,12 @@ const Dashboard = () => {
   // Play alarm sound when active
   useEffect(() => {
     if (alarmActive && audioRef.current) {
+      if (!alarmSoundLoaded) {
+        console.log("Trying to play alarm but sound not loaded yet");
+        // Try to reload and play
+        audioRef.current.load();
+      }
+      
       // Play sound with a small delay to ensure it starts
       const playPromise = audioRef.current.play();
       
@@ -75,7 +92,7 @@ const Dashboard = () => {
           toast({
             variant: "destructive",
             title: "Alarm Sound Error",
-            description: "Could not play alarm sound. Check your browser permissions.",
+            description: "Could not play alarm sound. Check your browser permissions or try clicking anywhere on the page first.",
           });
         });
       }
@@ -97,7 +114,7 @@ const Dashboard = () => {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
-  }, [alarmActive, toast]);
+  }, [alarmActive, alarmSoundLoaded, toast]);
 
   // Load user data on mount
   useEffect(() => {
@@ -210,6 +227,33 @@ const Dashboard = () => {
     }
   };
   
+  // Test alarm sound manually
+  const testAlarmSound = () => {
+    if (audioRef.current) {
+      if (audioRef.current.paused) {
+        toast({
+          title: "Testing Alarm Sound",
+          description: "Alarm sound should play now.",
+        });
+        audioRef.current.play().catch(error => {
+          console.error("Error playing test alarm:", error);
+          toast({
+            variant: "destructive",
+            title: "Alarm Sound Test Failed",
+            description: "Could not play alarm sound. Try clicking on the page first to enable audio playback.",
+          });
+        });
+      } else {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+        toast({
+          title: "Alarm Sound Stopped",
+          description: "Test completed.",
+        });
+      }
+    }
+  };
+  
   const handleStopAlarm = () => {
     setAlarmActive(false);
   };
@@ -319,6 +363,33 @@ const Dashboard = () => {
               </div>
             </CardContent>
           )}
+          
+          {/* Alarm sound status and test button */}
+          <CardContent className="pt-0 pb-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                {alarmSoundLoaded ? (
+                  <span className="text-xs text-green-600 flex items-center gap-1">
+                    <Bell className="h-3 w-3" />
+                    Alarm Ready
+                  </span>
+                ) : (
+                  <span className="text-xs text-red-500 flex items-center gap-1">
+                    <Bell className="h-3 w-3" />
+                    {alarmSoundError || "Alarm not ready"}
+                  </span>
+                )}
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={testAlarmSound}
+                className="text-xs"
+              >
+                Test Alarm
+              </Button>
+            </div>
+          </CardContent>
         </Card>
         
         <Card>
