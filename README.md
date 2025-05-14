@@ -1,4 +1,3 @@
-
 # Shop Security Monitor - Installation Guide
 
 This guide will help you get the Shop Security Monitor app running on your mobile device or as a web application.
@@ -51,6 +50,8 @@ http://localhost:5173
 
 4. Troubleshooting deployment:
    - If you encounter any issues with the server.js file, make sure the file is using ES module syntax (import/export) instead of CommonJS (require) since the project is set up with "type": "module" in package.json.
+   - If you see a "Missing parameter name" error related to path-to-regexp, check that your route patterns in server.js are simple (e.g., '/*' instead of '*').
+   - For persistent errors, try clearing the build cache on your deployment platform and redeploying.
 
 ## Mobile Installation Guide
 

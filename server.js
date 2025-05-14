@@ -14,7 +14,8 @@ const app = express();
 app.use(express.static(join(__dirname, 'dist')));
 
 // Serve index.html for any request that doesn't match a static file
-app.get('*', (req, res) => {
+// Using a simple path pattern that won't cause issues with path-to-regexp
+app.get('/*', (req, res) => {
   res.sendFile(join(__dirname, 'dist', 'index.html'));
 });
 
